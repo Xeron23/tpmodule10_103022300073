@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +8,7 @@ namespace tpmodule10_103022300073.controller
     [Route("api/[controller]")]
     public class MahasiswaController : ControllerBase
     {
-        // Ini adalah list yang akan menyimpan data mahasiswa
+        // List mahasiswa
         public static List<Mahasiswa> mahasiswaList = new List<Mahasiswa>();
 
         // GET api/Mahasiswa
@@ -19,16 +18,15 @@ namespace tpmodule10_103022300073.controller
             return Ok(mahasiswaList);
         }
 
-        // GET api/Mahasiswa/1
-        [HttpGet("{Nim}")]
-        public IActionResult GetById(string Nim)
+        // GET api/Mahasiswa/Index
+        [HttpGet("{index:int}")]
+        public IActionResult GetByIndex(int index)
         {
-            var mahasiswa = mahasiswaList.FirstOrDefault(m => m.Nim == Nim);
-            if (mahasiswa == null)
+            if (index < 0 || index >= mahasiswaList.Count)
             {
-                return NotFound("Mahasiswa tidak ditemukan");
+                return NotFound("Index tidak ditemukan");
             }
-            return Ok(mahasiswa);
+            return Ok(mahasiswaList[index]);
         }
 
         // POST api/Mahasiswa
@@ -42,40 +40,37 @@ namespace tpmodule10_103022300073.controller
 
             mahasiswaList.Add(mahasiswa);
 
-            // Menggunakan 'CreatedAtAction' dengan parameter yang benar
-            return CreatedAtAction(nameof(GetById), new { nim = mahasiswa.Nim }, mahasiswa);
+            // Kembalikan data dan index-nya
+            int index = mahasiswaList.Count - 1;
+            return CreatedAtAction(nameof(GetByIndex), new { index }, mahasiswa);
         }
 
-        // PUT api/Mahasiswa/1
-        [HttpPut("{Nim}")]
-        public IActionResult Put(string Nim, [FromBody] Mahasiswa mahasiswa)
+        // PUT api/Mahasiswa/Index
+        [HttpPut("{index:int}")]
+        public IActionResult Put(int index, [FromBody] Mahasiswa mahasiswa)
         {
-            var existingMahasiswa = mahasiswaList.FirstOrDefault(m => m.Nim == Nim);
-            if (existingMahasiswa == null)
+            if (index < 0 || index >= mahasiswaList.Count)
             {
-                return NotFound("Mahasiswa tidak ditemukan");
+                return NotFound("Index tidak ditemukan");
             }
 
-            existingMahasiswa.Nama = mahasiswa.Nama;
-            existingMahasiswa.Nim = mahasiswa.Nim;
+            mahasiswaList[index].Nama = mahasiswa.Nama;
+            mahasiswaList[index].Nim = mahasiswa.Nim;
 
-            return NoContent(); // Status code 204: No Content
+            return NoContent(); // 204
         }
 
-        // DELETE api/Mahasiswa/1
-        [HttpDelete("{Nim}")]
-        public IActionResult Delete(string Nim)
+        // DELETE api/Mahasiswa/Index
+        [HttpDelete("{index:int}")]
+        public IActionResult Delete(int index)
         {
-            var mahasiswa = mahasiswaList.FirstOrDefault(m => m.Nim == Nim);
-            if (mahasiswa == null)
+            if (index < 0 || index >= mahasiswaList.Count)
             {
-                return NotFound("Mahasiswa tidak ditemukan");
+                return NotFound("Index tidak ditemukan");
             }
 
-            mahasiswaList.Remove(mahasiswa);
-            return NoContent(); // Status code 204: No Content
+            mahasiswaList.RemoveAt(index);
+            return NoContent(); // 204
         }
     }
-
 }
-
